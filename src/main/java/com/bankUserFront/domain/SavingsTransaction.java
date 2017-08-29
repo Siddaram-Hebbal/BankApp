@@ -23,7 +23,7 @@ public class SavingsTransaction {
 	private double amount;
 	private BigDecimal availableBalance;
 	@ManyToOne
-	@JoinColumn(name="savings_ccount_id")
+	@JoinColumn(name="savings_account_id")
 	private SavingsAccount savingsAccount;
 	
 	public SavingsTransaction(){}
