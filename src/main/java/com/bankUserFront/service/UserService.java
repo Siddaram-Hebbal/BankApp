@@ -1,6 +1,9 @@
 package com.bankUserFront.service;
 
+import java.util.Set;
+
 import com.bankUserFront.domain.User;
+import com.bankUserFront.domain.security.UserRole;
 
 public interface UserService {
 	User findByUsername(String username);
@@ -14,4 +17,6 @@ public interface UserService {
     boolean checkEmailExists(String email);
     
     void save (User user);
+    
+    public User createUser(User user, Set<UserRole> userRoles);
 }
