@@ -1,14 +1,20 @@
 package com.bankUserFront.service.UserServiceImpl;
 
 import java.math.BigDecimal;
+import java.security.Principal;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bankUserFront.dao.PrimaryAccountDao;
 import com.bankUserFront.dao.SavingsAccountDao;
+import com.bankUserFront.dao.UserDao;
 import com.bankUserFront.domain.PrimaryAccount;
+import com.bankUserFront.domain.PrimaryTransaction;
 import com.bankUserFront.domain.SavingsAccount;
+import com.bankUserFront.domain.SavingsTransaction;
+import com.bankUserFront.domain.User;
 import com.bankUserFront.service.AccountService;
 
 @Service
@@ -21,6 +27,9 @@ public class AccountServiceImpl implements AccountService{
 	
 	@Autowired
 	private SavingsAccountDao savingsAccountDao;
+	
+	@Autowired
+	private UserDao userDao;
 
 	
 	public PrimaryAccount createPrimaryAccount() {
@@ -48,6 +57,74 @@ public class AccountServiceImpl implements AccountService{
 	
 	int accountGen(){
 		return ++nextAccountNumber;
+	}
+
+	@Override
+	public void deposit(String accountType, Double amount, Principal prinicpal) {
+		User user = userDao.findByUsername(prinicpal.getName()) ;
+		if(accountType.equalsIgnoreCase("Primary")){
+			PrimaryAccount primaryAccount = user.getPrimaryAccount();
+			primaryAccount.setAccountBalance(primaryAccount.getAccountBalance().add(new BigDecimal(amount)));
+			primaryAccountDao.save(primaryAccount);
+			
+			Date date = new Date();
+			
+			PrimaryTransaction primaryTransaction = new PrimaryTransaction(date, "Deposit to Primary account", "Account", "Finished", amount, primaryAccount.getAccountBalance(), primaryAccount);
+			//transctionService.savePrimaryDepositTransaction(primaryTransaction);
+			
+			
+		}
+		else if(accountType.equalsIgnoreCase("Savings")){
+			SavingsAccount savingsAccount = user.getSavingsAccount();
+			savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().add(new BigDecimal(amount)));
+			savingsAccountDao.save(savingsAccount);
+			
+			Date date = new Date();
+			
+			SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Deposit to savings account", "Account", "Finished", amount, savingsAccount.getAccountBalance(), savingsAccount);
+		}
+	}
+
+	@Override
+	public void withdraw(String accountType, Double amount, Principal prinicpal) {
+		User user = userDao.findByUsername(prinicpal.getName()) ;
+		if(accountType.equalsIgnoreCase("Primary")){
+			PrimaryAccount primaryAccount = user.getPrimaryAccount();
+			
+			if((primaryAccount.getAccountBalance().subtract(new BigDecimal(amount))).doubleValue()>=0.0){
+				primaryAccount.setAccountBalance(primaryAccount.getAccountBalance().subtract(new BigDecimal(amount)));
+			}
+			else{
+				primaryAccount.setAccountBalance(new BigDecimal(0));
+			}
+			
+			primaryAccountDao.save(primaryAccount);
+			
+			Date date = new Date();
+			
+			PrimaryTransaction primaryTransaction = new PrimaryTransaction(date, "Withdraw from Primary account", "Account", "Finished", amount, primaryAccount.getAccountBalance(), primaryAccount);
+			//transctionService.savePrimaryDepositTransaction(primaryTransaction);
+			
+			
+		}
+		else if(accountType.equalsIgnoreCase("Savings")){
+			SavingsAccount savingsAccount = user.getSavingsAccount();
+			
+			if((savingsAccount.getAccountBalance().subtract(new BigDecimal(amount))).doubleValue()>=0.0){
+				savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().subtract(new BigDecimal(amount)));
+			}
+			else{
+				savingsAccount.setAccountBalance(new BigDecimal(0));
+			}
+			
+			savingsAccountDao.save(savingsAccount);
+			
+			Date date = new Date();
+			
+			SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Withdraw from Savings account", "Account", "Finished", amount, savingsAccount.getAccountBalance(), savingsAccount);
+			//transctionService.savePrimaryDepositTransaction(primaryTransaction);
+		}
+		
 	}
 
 }

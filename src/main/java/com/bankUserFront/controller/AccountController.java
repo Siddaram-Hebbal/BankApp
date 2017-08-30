@@ -3,14 +3,17 @@ package com.bankUserFront.controller;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.bankUserFront.dao.UserDao;
 import com.bankUserFront.domain.PrimaryAccount;
 import com.bankUserFront.domain.SavingsAccount;
 import com.bankUserFront.domain.User;
+import com.bankUserFront.service.AccountService;
 
 @Controller
 @RequestMapping("/account")
@@ -18,6 +21,9 @@ public class AccountController {
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private AccountService accountService;
 	
 	@RequestMapping("/primaryAccount")
 	public String primaryAccount(Principal principal, Model model){
@@ -32,7 +38,37 @@ public class AccountController {
 		User user = userDao.findByUsername(principal.getName());
 		SavingsAccount savingsAccount = user.getSavingsAccount();
 		model.addAttribute("savingsAccount", savingsAccount);
-		
 		return "savingsAccount";
 	}
+	
+	@RequestMapping(value="/deposit", method=RequestMethod.GET)
+	public String deposit(Model model){
+		model.addAttribute("accountType", "");
+		model.addAttribute("amount", "");
+		
+		return "deposit";
+	}
+	
+	@RequestMapping(value="/deposit", method=RequestMethod.POST)
+	public String depositPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType, Principal principal){
+		accountService.deposit(accountType, Double.parseDouble(amount), principal);
+		
+		return "redirect:/userFront";
+	}
+	
+	@RequestMapping(value = "/withdraw", method  = RequestMethod.GET)
+	public String withdraw(Model model){
+		model.addAttribute("accountType", "");
+		model.addAttribute("amount", "");
+		
+		return "withdraw";
+	}
+	
+	@RequestMapping(value = "/withdraw", method  = RequestMethod.POST)
+	public String withdrawPOST(@ModelAttribute("amount") String amount, @ModelAttribute("accountType") String accountType, Principal principal){
+		accountService.withdraw(accountType, Double.parseDouble(amount), principal);
+		
+		return "redirect:/userFront";
+	}
+	
 }
