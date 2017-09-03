@@ -22,6 +22,7 @@ public class PrimaryTransaction {
 	private String status;
 	private double amount;
 	private BigDecimal availableBalance;
+	
 	@ManyToOne
 	@JoinColumn(name="primary_account_id")
 	private PrimaryAccount primaryAccount;

@@ -16,6 +16,7 @@ import com.bankUserFront.domain.SavingsAccount;
 import com.bankUserFront.domain.SavingsTransaction;
 import com.bankUserFront.domain.User;
 import com.bankUserFront.service.AccountService;
+import com.bankUserFront.service.TransactionService;
 
 @Service
 public class AccountServiceImpl implements AccountService{
@@ -30,6 +31,9 @@ public class AccountServiceImpl implements AccountService{
 	
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private TransactionService transactionService;
 
 	
 	public PrimaryAccount createPrimaryAccount() {
@@ -70,7 +74,7 @@ public class AccountServiceImpl implements AccountService{
 			Date date = new Date();
 			
 			PrimaryTransaction primaryTransaction = new PrimaryTransaction(date, "Deposit to Primary account", "Account", "Finished", amount, primaryAccount.getAccountBalance(), primaryAccount);
-			//transctionService.savePrimaryDepositTransaction(primaryTransaction);
+			transactionService.savePrimaryDepositTransaction(primaryTransaction);
 			
 			
 		}
@@ -82,6 +86,7 @@ public class AccountServiceImpl implements AccountService{
 			Date date = new Date();
 			
 			SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Deposit to savings account", "Account", "Finished", amount, savingsAccount.getAccountBalance(), savingsAccount);
+			transactionService.saveSavingsDepositTransaction(savingsTransaction);
 		}
 	}
 
@@ -103,7 +108,7 @@ public class AccountServiceImpl implements AccountService{
 			Date date = new Date();
 			
 			PrimaryTransaction primaryTransaction = new PrimaryTransaction(date, "Withdraw from Primary account", "Account", "Finished", amount, primaryAccount.getAccountBalance(), primaryAccount);
-			//transctionService.savePrimaryDepositTransaction(primaryTransaction);
+			transactionService.savePrimaryDepositTransaction(primaryTransaction);
 			
 			
 		}
@@ -122,7 +127,7 @@ public class AccountServiceImpl implements AccountService{
 			Date date = new Date();
 			
 			SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Withdraw from Savings account", "Account", "Finished", amount, savingsAccount.getAccountBalance(), savingsAccount);
-			//transctionService.savePrimaryDepositTransaction(primaryTransaction);
+			transactionService.saveSavingsWithdrawTransaction(savingsTransaction);
 		}
 		
 	}
