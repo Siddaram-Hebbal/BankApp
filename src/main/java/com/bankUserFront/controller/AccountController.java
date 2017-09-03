@@ -82,6 +82,7 @@ public class AccountController {
 		model.addAttribute("accountType", "");
 		model.addAttribute("amount", "");
 		
+		
 		return "withdraw";
 	}
 	
